@@ -1,5 +1,6 @@
 import os
 import streamlit as st
+from dotenv import load_dotenv
 from tmdb_recommender import (
     get_api_key,
     get_session,
@@ -13,6 +14,9 @@ from tmdb_recommender import (
 )
 
 st.set_page_config(page_title="TMDB Movie Recommender", page_icon="🎬", layout="wide")
+
+# Load environment variables from .env if present (local dev)
+load_dotenv()
 
 st.title("TMDB Movie Recommender")
 st.write("Enter a movie title to get 5 recommendations. Uses TMDB API.")
@@ -30,13 +34,8 @@ with st.sidebar:
 
 api_key = get_api_key()
 if not api_key:
-    with st.expander("Set TMDB API Key"):
-        api_key = st.text_input("TMDB API Key (v3 key or v4 token)", type="password")
-        if api_key:
-            os.environ["TMDB_API_KEY"] = api_key
-
-if not api_key:
-    st.warning("Provide TMDB API key via environment variable TMDB_API_KEY or the input above.")
+    st.error("TMDB_API_KEY not found in environment. Set it in your .env (local) or Heroku Config Vars and restart the app.")
+    st.stop()
 
 title = st.text_input("Movie title", value="Inception")
 run = st.button("Recommend")
